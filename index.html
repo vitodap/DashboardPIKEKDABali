@@ -3,39 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Embedded Content</title>
+  <title>Dashboard Monitoring PI KEKDA</title> 
+  
+  <!-- LOGO DI TAB BROWSER (FAVICON) -->
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/e/ea/Logo_Bank_Indonesia.png">
+
   <style>
-    /* Memastikan tidak ada margin/padding bawaan pada browser */
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #000; /* Background hitam saat loading/fullscreen */
+      background-color: #ffffff; /* Mengubah background jadi putih agar senada dengan BI */
+      font-family: Arial, sans-serif;
+    }
+
+    /* Gaya Tampilan Loading Screen */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    #loading-screen img {
+      width: 200px; /* Ukuran logo Bank Indonesia */
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #002d62; /* Warna biru gelap khas BI */
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
 
+  <!-- LOADING SCREEN DENGAN LOGO BI -->
+  <div id="loading-screen">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Logo_Bank_Indonesia.png" alt="Logo Bank Indonesia">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- IFRAME UTAMA -->
   <iframe 
+    id="my-iframe"
     src="https://script.google.com/macros/s/AKfycbziO0K9yol81ELtw4TKxvQEA2HhvzZrrfI5NHaJlDnBPWrFN2fl6VmROroHvwclbKjg/exec"
     width="100%"
     height="100%"
     allowfullscreen="true"
     allow="fullscreen"
-    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none; display: none;">
   </iframe>
 
   <script>
-    window.onload = function() {
-      // Catatan: Sebagian besar browser modern akan memblokir fullscreen otomatis 
-      // tanpa adanya interaksi user (klik/tap) terlebih dahulu karena aturan privasi.
-      document.querySelector('iframe')
-        .requestFullscreen()
-        .catch((err) => {
-          console.warn('Fullscreen otomatis diblokir browser (butuh klik user):', err.message);
-        });
+    const iframe = document.getElementById('my-iframe');
+    const loadingScreen = document.getElementById('loading-screen');
+
+    // Menghilangkan loading screen setelah iframe selesai dimuat oleh browser
+    iframe.onload = function() {
+      iframe.style.display = 'block';
+      loadingScreen.style.opacity = '0';
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 500);
+
+      // Mencoba meminta fullscreen otomatis
+      iframe.requestFullscreen().catch((err) => {
+        console.warn('Fullscreen otomatis diblokir browser:', err.message);
+      });
     };
   </script>
 
