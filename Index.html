@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embedded Content</title>
+  <style>
+    /* Memastikan tidak ada margin/padding bawaan pada browser */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000; /* Background hitam saat loading/fullscreen */
+    }
+  </style>
+</head>
+<body>
+
+  <iframe 
+    src="https://script.google.com/macros/s/AKfycbziO0K9yol81ELtw4TKxvQEA2HhvzZrrfI5NHaJlDnBPWrFN2fl6VmROroHvwclbKjg/exec"
+    width="100%"
+    height="100%"
+    allowfullscreen="true"
+    allow="fullscreen"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+  </iframe>
+
+  <script>
+    window.onload = function() {
+      // Catatan: Sebagian besar browser modern akan memblokir fullscreen otomatis 
+      // tanpa adanya interaksi user (klik/tap) terlebih dahulu karena aturan privasi.
+      document.querySelector('iframe')
+        .requestFullscreen()
+        .catch((err) => {
+          console.warn('Fullscreen otomatis diblokir browser (butuh klik user):', err.message);
+        });
+    };
+  </script>
+
+</body>
+</html>
