@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Monitoring PI KEKDA</title> 
   
+  <!-- LOGO DI TAB BROWSER (FAVICON) -->
   <link rel="icon" type="image/png" href="https://crystalpng.com/wp-content/uploads/2025/12/Bank-Indonesia-Logo.png">
 
   <style>
@@ -32,37 +33,56 @@
       align-items: center;
       z-index: 9999;
       opacity: 1;
-      transition: opacity 0.8s ease-in-out; /* Efek memudar lebih halus */
+      transition: opacity 0.8s ease-in-out;
     }
 
     #loading-screen img {
-      width: 200px; 
+      width: 320px; 
       height: auto;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #002d62; 
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
+    /* Progress Bar Container */
+    .progress-container {
+      width: 250px;
+      background-color: #f3f3f3;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    /* Progress Bar Fill */
+    .progress-bar {
+      height: 6px;
+      width: 0%;
+      background-color: #002d62; /* Warna biru khas BI */
+      border-radius: 10px;
+      transition: width 0.1s linear;
+    }
+
+    /* Tulisan Loading & Persentase */
+    .loading-text {
+      font-size: 14px;
+      color: #555555;
+      font-weight: bold;
+      letter-spacing: 0.5px;
     }
   </style>
 </head>
 <body>
 
+  <!-- LOADING SCREEN DENGAN PROGRESS BAR -->
   <div id="loading-screen">
-    <img src="https://crystalpng.com/wp-content/uploads/2025/12/Bank-Indonesia-Logo.png">
-    <div class="spinner"></div>
+    <img src="https://crystalpng.com/wp-content/uploads/2025/12/Bank-Indonesia-Logo.png" alt="Logo Bank Indonesia">
+    
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="loading-text" id="loading-text">Memuat Dashboard... 0%</div>
   </div>
 
+  <!-- IFRAME UTAMA -->
   <iframe 
     id="my-iframe"
     src="https://script.google.com/macros/s/AKfycbziO0K9yol81ELtw4TKxvQEA2HhvzZrrfI5NHaJlDnBPWrFN2fl6VmROroHvwclbKjg/exec"
@@ -76,23 +96,45 @@
   <script>
     const iframe = document.getElementById('my-iframe');
     const loadingScreen = document.getElementById('loading-screen');
+    const progressBar = document.getElementById('progress-bar');
+    const loadingText = document.getElementById('loading-text');
 
-    // Ketika jaringan mendeteksi iframe selesai dimuat
+    let progress = 0;
+    const totalDuration = 5000; // Total waktu loading tiruan (5 detik)
+    const intervalTime = 50; // Update setiap 50ms
+    const increment = 100 / (totalDuration / intervalTime);
+
+    // Menjalankan animasi progress bar sejak halaman pertama kali dibuka
+    const progressInterval = setInterval(() => {
+      if (progress < 98) { // Menahan di 98% sampai iframe benar-benar siap
+        progress += increment;
+        if (progress > 98) progress = 98;
+        updateLoadingUI(progress);
+      }
+    }, intervalTime);
+
+    function updateLoadingUI(value) {
+      const roundedValue = Math.floor(value);
+      progressBar.style.width = roundedValue + '%';
+      loadingText.innerText = `Memuat Dashboard... ${roundedValue}%`;
+    }
+
+    // Ketika jaringan mendeteksi iframe selesai dimuat oleh browser
     iframe.onload = function() {
-      // Menahan loading screen selama 2,5 detik agar proses render di background selesai sempurna
+      // Pastikan indikator langsung meloncat ke 100%
+      clearInterval(progressInterval);
+      updateLoadingUI(100);
+
+      // Berikan jeda sebentar pada 100% agar user sempat melihatnya sebelum menghilang
       setTimeout(() => {
-        // Tampilkan iframe secara instan di belakang layar
         iframe.style.visibility = 'visible';
-        
-        // Pudarkan loading screen secara halus
         loadingScreen.style.opacity = '0';
         
-        // Hapus total elemen loading screen setelah animasi pudar selesai
         setTimeout(() => {
           loadingScreen.style.display = 'none';
         }, 800);
         
-      }, 2500); 
+      }, 600); 
     };
   </script>
 
