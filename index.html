@@ -56,9 +56,9 @@
     .progress-bar {
       height: 6px;
       width: 0%;
-      background-color: #002d62; /* Warna biru khas BI */
+      background-color: #002d62; 
       border-radius: 10px;
-      transition: width 0.1s linear;
+      transition: width 0.2s ease-out; /* Pergerakan lebih smooth */
     }
 
     /* Tulisan Loading & Persentase */
@@ -100,15 +100,16 @@
     const loadingText = document.getElementById('loading-text');
 
     let progress = 0;
-    const totalDuration = 5000; // Total waktu loading tiruan (5 detik)
-    const intervalTime = 50; // Update setiap 50ms
+    // Menaikkan durasi simulasi awal ke 6 detik agar bar berjalan lebih sinkron dengan server Google
+    const totalDuration = 6000; 
+    const intervalTime = 50; 
     const increment = 100 / (totalDuration / intervalTime);
 
-    // Menjalankan animasi progress bar sejak halaman pertama kali dibuka
+    // Jalankan animasi progress bar
     const progressInterval = setInterval(() => {
-      if (progress < 98) { // Menahan di 98% sampai iframe benar-benar siap
+      if (progress < 95) { // Ditahan di 95% untuk menunggu trigger onload asli dari iframe
         progress += increment;
-        if (progress > 98) progress = 98;
+        if (progress > 95) progress = 95;
         updateLoadingUI(progress);
       }
     }, intervalTime);
@@ -119,22 +120,28 @@
       loadingText.innerText = `Memuat Dashboard... ${roundedValue}%`;
     }
 
-    // Ketika jaringan mendeteksi iframe selesai dimuat oleh browser
+    // Terpancing saat browser selesai mengunduh kerangka iframe
     iframe.onload = function() {
-      // Pastikan indikator langsung meloncat ke 100%
       clearInterval(progressInterval);
+      
+      // Buat animasi berjalan ke 100% secara natural
       updateLoadingUI(100);
 
-      // Berikan jeda sebentar pada 100% agar user sempat melihatnya sebelum menghilang
+      // KUNCI SOLUSI: Berikan ekstra jeda aman (3000ms / 3 detik) setelah menyentuh angka 100%
+      // Waktu ini digunakan untuk memastikan server Google selesai merender komponen visual di dalam iframe.
       setTimeout(() => {
+        // Tampilkan iframe secara instan di latar belakang
         iframe.style.visibility = 'visible';
+        
+        // Pudarkan loading screen berlogo BI secara halus
         loadingScreen.style.opacity = '0';
         
+        // Hapus total elemen loading screen agar tidak mengganggu klik pada dashboard
         setTimeout(() => {
           loadingScreen.style.display = 'none';
         }, 800);
         
-      }, 600); 
+      }, 3000); // <-- Jika layar putih masih sesekali muncul, angka 3000 ini bisa dinaikkan menjadi 4000 atau 5000
     };
   </script>
 
